@@ -5,6 +5,7 @@ import com.post_hub.iam_service.service.CommentService;
 import com.post_hub.iam_service.service.impl.CommentServiceImpl;
 import com.post_hub.iam_service.service.impl.SecondCommentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,28 +19,31 @@ import java.util.Map;
 @RequestMapping("/comments")
 public class CommentController {
 
-    private CommentService commentService;
+    private final CommentService defaultcommentService;
+    private final CommentService advancedcommentService;
 
     @Autowired
-    public void  setCommentService(CommentServiceImpl commentService) {
-        this.commentService = commentService;
+    public CommentController(
+            CommentService defaultcommentService,
+            @Qualifier("advancedCommentService") CommentService advancedcommentService) {
+        this.defaultcommentService = defaultcommentService;
+        this.advancedcommentService = advancedcommentService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> addComment(@RequestBody Map<String, Object> requestBody) {
-        String content = (String) requestBody.get("content");
-        commentService.createComment(content);
 
-        return new ResponseEntity<>("Comment added: " + content,HttpStatus.OK);
+    @PostMapping("/createDefault")
+    public ResponseEntity<String> createDefaultComment(@RequestBody Map<String, Object> requestBody) {
+        String content = (String) requestBody.get("content");
+        defaultcommentService.createComment(content);
+
+        return new ResponseEntity<>("Default comment added: " + content,HttpStatus.OK);
     }
 
-    @PostMapping("/switchService")
-    public ResponseEntity<String> switchToSecondService(@RequestBody Map<String, Object> requestBody) {
-        this.commentService = new SecondCommentServiceImpl();
-
+    @PostMapping("/createAdvanced")
+    public ResponseEntity<String> createAdvancedComment(@RequestBody Map<String, Object> requestBody) {
         String content = (String) requestBody.get("content");
-        commentService.createComment(content);
+        advancedcommentService.createComment(content);
 
-        return new ResponseEntity<>("Switched to SecondCommentService and added: " + content,HttpStatus.OK);
+        return new ResponseEntity<>("Advanced comment added: " + content,HttpStatus.OK);
     }
 }
