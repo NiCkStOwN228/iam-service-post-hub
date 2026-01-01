@@ -1,12 +1,8 @@
 package com.post_hub.iam_service.controller;
 
-
-import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.constants.ApiLogMessage;
 import com.post_hub.iam_service.model.dto.post.PostDTO;
-import com.post_hub.iam_service.model.entity.Post;
 import com.post_hub.iam_service.model.response.IamResponse;
-import com.post_hub.iam_service.repository.PostRepository;
 import com.post_hub.iam_service.service.PostService;
 import com.post_hub.iam_service.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
