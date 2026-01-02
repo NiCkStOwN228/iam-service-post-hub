@@ -1,14 +1,14 @@
 # Iam Service Post Hub
 
-Это простой Java-сервис API для управления постами пользователей (CRUD).
-Использует Spring Boot + Maven + PostgreSQL.
+This is a simple Java API for managing user posts (CRUD).
+Uses Spring Boot + Maven + PostgreSQL.
 
-## Что умеет
-- Создавать посты
-- Читать посты
-- Обновлять и удалять
+## What it can do
+- Create posts
+- Read posts
+- Update and delete
 
-## Как запустить
-1. Склонировать репозиторий
-2. Запустить `mvn spring-boot:run`
-3. Открыть на http://localhost:8080/api
+## How to run
+1. Clone the repository
+2. Run `mvn spring-boot:run`
+3. Open at http://localhost:8080/api
