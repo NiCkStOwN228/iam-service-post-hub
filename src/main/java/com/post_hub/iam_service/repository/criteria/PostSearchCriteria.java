@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Root;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ public class ApiUtils {
 
     public static String getMethodName() {
         try {
-            return Thread.currentThread().getStackTrace()[1].getMethodName();
+            return new Throwable().getStackTrace()[1].getMethodName();
         } catch (Exception cause) {
             return ApiConstants.UNDEFINED;
         }

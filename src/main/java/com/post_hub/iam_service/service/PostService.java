@@ -19,9 +19,9 @@ public interface PostService {
 
     IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest updatePostRequest);
 
-    void softDeletePost(@NotNull Integer postId);
+    void softDeletePost(Integer postId);
 
     IamResponse<PaginationResponse<PostSearchDTO>> findAllPosts(Pageable pageable);
 
-    IamResponse<PaginationResponse<PostSearchDTO>> searchPosts(@NotNull PostSearchRequest request, Pageable pageable);
+    IamResponse<PaginationResponse<PostSearchDTO>> searchPosts(PostSearchRequest request, Pageable pageable);
 }
