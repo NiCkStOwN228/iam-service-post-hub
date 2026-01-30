@@ -1,5 +1,6 @@
 package com.post_hub.iam_service.model.entity;
 
+import com.post_hub.iam_service.model.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,4 +39,8 @@ public class Post {
 
     @Column(nullable = false)
     private Boolean deleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
