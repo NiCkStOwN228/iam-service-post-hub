@@ -8,7 +8,7 @@ import com.post_hub.iam_service.model.entity.Post;
 import com.post_hub.iam_service.model.entity.User;
 import com.post_hub.iam_service.model.exception.DataExistException;
 import com.post_hub.iam_service.model.exception.NotFoundException;
-import com.post_hub.iam_service.model.request.post.PostRequest;
+import com.post_hub.iam_service.model.request.post.NewPostRequest;
 import com.post_hub.iam_service.model.request.post.PostSearchRequest;
 import com.post_hub.iam_service.model.request.post.UpdatePostRequest;
 import com.post_hub.iam_service.model.response.IamResponse;
@@ -44,15 +44,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public IamResponse<PostDTO> createPost(@NotNull Integer userId, PostRequest postRequest) {
-        if (postRepository.existsByTitle(postRequest.getTitle())) {
-            throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXISTS.getMessage(postRequest.getTitle()));
+    public IamResponse<PostDTO> createPost(@NotNull Integer userId, NewPostRequest request) {
+        if (postRepository.existsByTitle(request.getTitle())) {
+            throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXISTS.getMessage(request.getTitle()));
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(userId)));
 
-        Post post = postMapper.createPost(postRequest, user);
+        Post post = postMapper.createPost(request, user);
         Post savedPost = postRepository.save(post);
         PostDTO postDto = postMapper.toPostDTO(savedPost);
 
@@ -60,12 +60,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest postRequest) {
-
+    public IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest request) {
         Post post = postRepository.findByIdAndDeletedFalse(postId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
 
-        postMapper.updatePost(post, postRequest);
+        postMapper.updatePost(post, request);
         post.setUpdated(LocalDateTime.now());
         post = postRepository.save(post);
 
@@ -103,6 +102,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public IamResponse<PaginationResponse<PostSearchDTO>> searchPosts(PostSearchRequest request, Pageable pageable) {
         Specification<Post> specification = new PostSearchCriteria(request);
+
         Page<PostSearchDTO> posts = postRepository.findAll(specification, pageable)
                 .map(postMapper::toPostSearchDTO);
 

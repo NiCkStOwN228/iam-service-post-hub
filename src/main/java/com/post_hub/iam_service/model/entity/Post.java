@@ -46,4 +46,5 @@ public class Post {
 
     @Column(name = "created_by")
     private String createdBy;
+
 }

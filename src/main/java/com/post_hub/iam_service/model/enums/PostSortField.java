@@ -4,4 +4,5 @@ public enum PostSortField {
     TITLE,
     CONTENT,
     LIKES
+
 }

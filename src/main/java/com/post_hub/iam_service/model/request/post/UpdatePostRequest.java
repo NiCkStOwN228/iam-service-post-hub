@@ -15,8 +15,10 @@ public class UpdatePostRequest implements Serializable {
 
     @NotBlank(message = "Title cannot be empty")
     public String title;
+
     @NotBlank(message = "Content cannot be empty")
     public String content;
+
     @NotNull(message = "Specify the number of likes")
     public Integer likes;
 

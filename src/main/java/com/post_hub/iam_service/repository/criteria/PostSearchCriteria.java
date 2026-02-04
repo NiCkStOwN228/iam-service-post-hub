@@ -6,8 +6,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ public class PostSearchCriteria implements Specification<Post> {
 
     @Override
     public Predicate toPredicate(
-            @NotNull Root<Post> root,
+            @NonNull Root<Post> root,
             CriteriaQuery<?> query,
-            @NotNull CriteriaBuilder criteriaBuilder) {
+            @NonNull CriteriaBuilder criteriaBuilder) {
 
         List<Predicate> predicates = new ArrayList<>();
 
