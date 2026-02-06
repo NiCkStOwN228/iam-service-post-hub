@@ -36,7 +36,7 @@ public class UserSearchCriteria implements Specification<User> {
         }
 
         if (Objects.nonNull(request.getDeleted())){
-            predicates.add(criteriaBuilder.equal(root.get(User.DELETED_FIELD), "%" + request.getDeleted()));
+            predicates.add(criteriaBuilder.equal(root.get(User.DELETED_FIELD), request.getDeleted()));
         }
 
         if (Objects.nonNull(request.getKeyword())) {
