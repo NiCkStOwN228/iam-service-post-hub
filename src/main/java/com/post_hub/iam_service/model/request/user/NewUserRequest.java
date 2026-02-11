@@ -15,7 +15,7 @@ public class NewUserRequest {
     @Size(max = 30)
     private String username;
 
-    @NotBlank(message = "Password cannot be empty")
+    @NotBlank(message = "PasswordHasher cannot be empty")
     @Size(max = 50)
     private String password;
 
