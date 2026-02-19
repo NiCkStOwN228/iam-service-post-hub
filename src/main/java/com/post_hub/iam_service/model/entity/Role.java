@@ -28,8 +28,8 @@ public class Role {
     @Convert(converter = UserRoleTypeConverter.class)
     private IamServiceUserRole userSystemRole;
 
-    @Column
-    private Boolean active;
+    @Column()
+    private boolean active;
 
     @Column(name = "created_by")
     private String createdBy;

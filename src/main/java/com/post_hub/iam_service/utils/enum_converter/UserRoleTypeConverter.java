@@ -8,7 +8,7 @@ import jakarta.persistence.Converter;
 public class UserRoleTypeConverter implements AttributeConverter<IamServiceUserRole, String> {
     @Override
     public String convertToDatabaseColumn(IamServiceUserRole iamServiceUserRole) {
-        return IamServiceUserRole.USER.name();
+        return iamServiceUserRole.name();
     }
 
     @Override
