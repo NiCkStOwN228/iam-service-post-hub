@@ -1,6 +1,5 @@
 package com.post_hub.iam_service.model.entity;
 
-import com.post_hub.iam_service.model.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

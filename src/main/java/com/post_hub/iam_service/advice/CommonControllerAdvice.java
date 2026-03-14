@@ -2,9 +2,11 @@ package com.post_hub.iam_service.advice;
 
 import com.post_hub.iam_service.model.constants.ApiConstants;
 import com.post_hub.iam_service.model.exception.DataExistException;
+import com.post_hub.iam_service.model.exception.InvalidDataException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -51,6 +53,24 @@ public class CommonControllerAdvice {
         }
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    protected ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+        logStackTrace(ex);
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDataException.class)
+    @ResponseBody
+    protected ResponseEntity<String> handleInvalidDataException(InvalidDataException ex) {
+        logStackTrace(ex);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 
     private void logStackTrace(Exception ex) {

@@ -1,8 +1,9 @@
 package com.post_hub.iam_service.service.model;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuthenticationConstants {
 
     public static final String USER_ID = "userId";
