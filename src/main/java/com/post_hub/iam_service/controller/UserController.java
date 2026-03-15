@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("${end.point.users}")
+@RequestMapping("${end.points.users}")
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("${end.point.id}")
+    @GetMapping("${end.points.id}")
     public ResponseEntity<IamResponse<UserDTO>> getUserById(
             @PathVariable(name = "id") Integer userId) {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("${end.point.create}")
+    @PostMapping("${end.points.create}")
     public ResponseEntity<IamResponse<UserDTO>> createUser(
             @RequestBody @Valid NewUserRequest request) {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PutMapping("${end.point.id}")
+    @PutMapping("${end.points.id}")
     public ResponseEntity<IamResponse<UserDTO>> updateUserById(
             @PathVariable(name = "id") Integer userId,
             @RequestBody @Valid UpdateUserRequest request) {
@@ -55,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    @DeleteMapping("${end.point.id}")
+    @DeleteMapping("${end.points.id}")
     public ResponseEntity<Void> softDeleteUser(
             @PathVariable(name = "id") Integer userId
     ){
@@ -65,7 +65,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("${end.point.all}")
+    @GetMapping("${end.points.all}")
     public ResponseEntity<IamResponse<PaginationResponse<UserSearchDTO>>> getAllUsers(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "limit", defaultValue = "10") int limit){
@@ -76,7 +76,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("${end.point.search}")
+    @PostMapping("${end.points.search}")
     public ResponseEntity<IamResponse<PaginationResponse<UserSearchDTO>>> searchUsers(
             @RequestBody @Valid UserSearchRequest request,
             @RequestParam(name = "page", defaultValue = "0") int page,

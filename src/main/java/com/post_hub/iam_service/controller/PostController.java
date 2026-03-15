@@ -28,7 +28,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("${end.point.id}")
+    @GetMapping("${end.points.id}")
     public ResponseEntity<IamResponse<PostDTO>> getPostById(
             @PathVariable(name = "id") Integer postId) {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
@@ -37,7 +37,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("${end.point.create}")
+    @PostMapping("${end.points.create}")
     public ResponseEntity<IamResponse<PostDTO>> createPost(
             @RequestBody @Valid NewPostRequest request){
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
@@ -49,7 +49,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("${end.point.id}")
+    @PutMapping("${end.points.id}")
     public ResponseEntity<IamResponse<PostDTO>> updatePostById(
             @PathVariable(name = "id") Integer postId,
             @RequestBody @Valid UpdatePostRequest request){
@@ -59,7 +59,7 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    @DeleteMapping("${end.point.id}")
+    @DeleteMapping("${end.points.id}")
     public ResponseEntity<Void> softDeletePostById(
             @PathVariable(name = "id") Integer postId){
                 log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
@@ -68,7 +68,7 @@ public class PostController {
                 return ResponseEntity.ok().build();
     }
 
-    @GetMapping("${end.point.all}")
+    @GetMapping("${end.points.all}")
     public ResponseEntity<IamResponse<PaginationResponse<PostSearchDTO>>> getAllPosts(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "limit", defaultValue = "10") int limit) {
@@ -79,7 +79,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("${end.point.search}")
+    @PostMapping("${end.points.search}")
     public  ResponseEntity<IamResponse<PaginationResponse<PostSearchDTO>>> searchPost(
             @RequestBody @Valid PostSearchRequest request,
             @RequestParam(name = "page", defaultValue = "0") int page,
