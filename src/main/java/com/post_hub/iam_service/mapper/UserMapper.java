@@ -60,5 +60,4 @@ public interface UserMapper {
                 .map(role -> new RoleDTO(role.getId(), role.getName()))
                 .toList();
     }
-
 }
