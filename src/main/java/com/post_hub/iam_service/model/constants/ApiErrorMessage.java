@@ -25,7 +25,6 @@ public enum ApiErrorMessage {
     INVALID_USER_REGISTRATION_STATUS("Invalid user registration status: %s. "),
     NOT_FOUND_REFRESH_TOKEN("Refresh token not found"),
     ;
-
     private final String message;
 
     public String getMessage(Object... args) {
