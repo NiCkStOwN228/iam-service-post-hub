@@ -37,7 +37,7 @@ public class AccessValidator {
         }
 
         if (PasswordUtils.isNotValidPassword(password)) {
-            throw new InvalidDataException(ApiErrorMessage.INVALID_PASSWORD.getMessage());
+            throw new InvalidPasswordException(ApiErrorMessage.INVALID_PASSWORD.getMessage());
         }
 
     }

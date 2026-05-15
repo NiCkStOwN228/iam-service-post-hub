@@ -7,12 +7,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.Objects;
-
 @Mapper(
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        imports = {DateTimeUtils.class, Objects.class}
+        imports = {DateTimeUtils.class, Object.class}
 )
 public interface CommentMapper {
 

@@ -27,7 +27,7 @@ public class Comment {
     private User user;
 
     @Column(nullable = false, length = 500)
-    private String massage;
+    private String message;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime created = LocalDateTime.now();
