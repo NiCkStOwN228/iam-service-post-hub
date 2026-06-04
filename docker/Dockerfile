@@ -1,4 +1,4 @@
-FROM opebjdk:21
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /srv
 
