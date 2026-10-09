@@ -1,4 +1,4 @@
-package com.post_hub.iam_service;
+package com.post_hub.iam_service.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
