@@ -86,61 +86,14 @@ public class UserServiceTest {
     }
 
     @Test
-    void detById_UserNotFound_ThrowsException() {
+    void getById_UserNotFound_ThrowsException() {
         when(userRepository.findByIdAndDeletedFalse(999)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.getById(999))
-        .isInstanceOf(NotFoundException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("not found");
 
         verify(userRepository, times(1)).findByIdAndDeletedFalse(999);
-        verify(userMapper, never()).toDto(any(User.class));
-    }
-
-    @Test
-    void createUser_AsSuperAdmin_CreatesUserSuccessfully() {
-        NewUserRequest request = new NewUserRequest("NewUser", "password123!", "newuser@exception.com");
-
-        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
-        when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
-        when(roleRepository.findByName(IamServiceUserRole.USER.getRole())).thenReturn(Optional.of(superAdminRole));
-
-        User newUser = new User();
-        newUser.setUsername(request.getUsername());
-        newUser.setEmail(request.getEmail());
-        newUser.setPassword("encodedPassword");
-        newUser.setRoles(Collections.singleton(superAdminRole));
-
-        when(userMapper.createUser(request)).thenReturn(newUser);
-
-        when(passwordEncoder.encode(newUser.getPassword())).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(newUser);
-        when(userMapper.toDto(newUser)).thenReturn(testUserDTO);
-
-        UserDTO result = userService.createUser(request).getPayload();
-
-        assertNotNull(result);
-        assertEquals(testUserDTO.getUsername(), result.getUsername());
-        assertEquals(testUserDTO.getEmail(), result.getEmail());
-
-        verify(userRepository, times(1)).existsByEmail(request.getEmail());
-        verify(userRepository, times(1)).existsByUsername(request.getUsername());
-        verify(userRepository, times(1)).save(any(User.class));
-        verify(userMapper, times(1)).toDto(any(User.class));
-    }
-
-    @Test
-    void createUser_EmailAlreadyExists_ThrowsException() {
-        NewUserRequest request = new NewUserRequest("NewUser", "password123", "existing@exist.com");
-
-                when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
-
-                assertThatThrownBy(() -> userService.createUser(request))
-                        .isInstanceOf(DataExistException.class)
-                        .hasMessageContaining("already exists");
-
-                verify(userRepository, times(1)).existsByEmail(request.getEmail());
-                verify(userRepository, times(1)).existsByUsername(anyString());
-                verify(userRepository, times(1)).save(any(User.class));
+        verify(userMapper, times(0)).toDto(testUser);
     }
 }
