@@ -4,7 +4,9 @@ import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.dto.post.PostDTO;
 import com.post_hub.iam_service.model.entity.Post;
 import com.post_hub.iam_service.model.entity.User;
+import com.post_hub.iam_service.model.exception.DataExistException;
 import com.post_hub.iam_service.model.exception.NotFoundException;
+import com.post_hub.iam_service.model.request.post.NewPostRequest;
 import com.post_hub.iam_service.repository.PostRepository;
 import com.post_hub.iam_service.repository.UserRepository;
 import com.post_hub.iam_service.service.Impl.PostServiceImpl;
@@ -15,11 +17,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -89,6 +91,27 @@ public class PostServiceTest {
 
         verify(postRepository, times(1)).findByIdAndDeletedFalse(999);
         verify(postMapper, never()).toPostDTO(any(Post.class));
+    }
+
+    @Test
+    void createPost_OK() {
+        NewPostRequest request = new NewPostRequest("New Title", "New Content", 100);
+
+        when(apiUtils.getUserIdFromAuthentification()).thenReturn(testUser.getId());
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(postRepository.save(any(Post.class))).thenReturn(testPost);
+        when(postMapper.toPostDTO(testPost)).thenReturn(testPostDTO);
+
+        PostDTO result = postService.createPost(request).getPayload();
+
+        assertNotNull(result);
+        assertEquals(testPostDTO.getId(), result.getId());
+        assertEquals(testPostDTO.getContent(), result.getContent());
+
+        verify(apiUtils, times(1)).getUserIdFromAuthentification();
+        verify(userRepository, times(1)).findById(testUser.getId());
+        verify(postRepository, times(1)).save(any(Post.class));
+        verify(postMapper, times(1)).toPostDTO(any(Post.class));
     }
 
 
