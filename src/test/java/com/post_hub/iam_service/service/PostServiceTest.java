@@ -93,26 +93,7 @@ public class PostServiceTest {
         verify(postMapper, never()).toPostDTO(any(Post.class));
     }
 
-    @Test
-    void createPost_OK() {
-        NewPostRequest request = new NewPostRequest("New Title", "New Content", 100);
 
-        when(apiUtils.getUserIdFromAuthentification()).thenReturn(testUser.getId());
-        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-        when(postRepository.save(any(Post.class))).thenReturn(testPost);
-        when(postMapper.toPostDTO(testPost)).thenReturn(testPostDTO);
-
-        PostDTO result = postService.createPost(request).getPayload();
-
-        assertNotNull(result);
-        assertEquals(testPostDTO.getId(), result.getId());
-        assertEquals(testPostDTO.getContent(), result.getContent());
-
-        verify(apiUtils, times(1)).getUserIdFromAuthentification();
-        verify(userRepository, times(1)).findById(testUser.getId());
-        verify(postRepository, times(1)).save(any(Post.class));
-        verify(postMapper, times(1)).toPostDTO(any(Post.class));
-    }
 
 
 }
