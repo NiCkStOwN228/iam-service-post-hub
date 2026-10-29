@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${end.point.auth}")
+@RequestMapping("${end.points.auth}")
 @Tag(name = "Auth", description = "Authorization methods")
 public class AuthController{
     private final AuthService authService;
@@ -34,7 +34,7 @@ public class AuthController{
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = "{ \"token\": \"eyJhbGcIoIJIuz...\" }")))
     })
-    @PostMapping("${end.point.login}")
+    @PostMapping("${end.points.login}")
     @Operation(
             summary = "User login",
             description = "Authenticates the user and returns an access/refresh token"
@@ -51,7 +51,7 @@ public class AuthController{
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("${end.point.refresh.token}")
+    @GetMapping("${end.points.refresh.token}")
     @Operation(
             summary = "Refresh access token",
             description = "Generates new access token using provided refresh token"
@@ -68,7 +68,7 @@ public class AuthController{
     return ResponseEntity.ok(result);
     }
 
-    @PostMapping("${end.point.register}")
+    @PostMapping("${end.points.register}")
     @Operation(
             summary = "Register a new user",
             description = "Creates new user and returns authentication details"
