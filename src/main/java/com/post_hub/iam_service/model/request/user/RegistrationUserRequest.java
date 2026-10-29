@@ -28,5 +28,4 @@ public class RegistrationUserRequest implements Serializable {
     @NotEmpty
     private String confirmPassword;
 
-
 }

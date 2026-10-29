@@ -1,9 +1,8 @@
-package com.post_hub.iam_service.service.Impl;
+package com.post_hub.iam_service.service.impl;
 
 import com.post_hub.iam_service.mapper.UserMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.entity.Role;
-import com.post_hub.iam_service.model.exception.DataExistException;
 import com.post_hub.iam_service.model.exception.NotFoundException;
 import com.post_hub.iam_service.model.request.user.LoginRequest;
 import com.post_hub.iam_service.model.dto.user.UserProfileDTO;
@@ -19,7 +18,6 @@ import com.post_hub.iam_service.security.validation.AccessValidator;
 import com.post_hub.iam_service.service.AuthService;
 import com.post_hub.iam_service.service.RefreshTokenService;
 import com.post_hub.iam_service.service.model.IamServiceUserRole;
-import com.post_hub.iam_service.utils.PasswordUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +26,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,12 +45,13 @@ public class AuthServiceImpl implements AuthService {
     private final AccessValidator accessValidator;
 
     @Override
+    @Transactional
     public IamResponse<UserProfileDTO> login(@NotNull LoginRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-        } catch (BadCredentialsException e){
+        } catch (BadCredentialsException e) {
             throw new InvalidDataException(ApiErrorMessage.INVALID_USER_OR_PASSWORD.getMessage());
         }
 
@@ -67,8 +67,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public IamResponse<UserProfileDTO> refreshAccessToken(String refreshTokenValue) {
-
         RefreshToken refreshToken = refreshTokenService.validateAndRefreshToken(refreshTokenValue);
         User user = refreshToken.getUser();
 
@@ -80,6 +80,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public IamResponse<UserProfileDTO> registerUser(@NotNull RegistrationUserRequest request) {
         accessValidator.validateNewUser(
                 request.getUsername(),
@@ -98,11 +99,12 @@ public class AuthServiceImpl implements AuthService {
         newUser.setRoles(roles);
         userRepository.save(newUser);
 
-        RefreshToken refreshToken = refreshTokenService.generateOrUpdateRefreshToken(newUser);
+        RefreshToken refreshToken  = refreshTokenService.generateOrUpdateRefreshToken(newUser);
         String token = jwtTokenProvider.generateToken(newUser);
         UserProfileDTO userProfileDTO = userMapper.toUserProfileDto(newUser, token, refreshToken.getToken());
         userProfileDTO.setToken(token);
 
         return IamResponse.createSuccessfulWithNewToken(userProfileDTO);
     }
+
 }

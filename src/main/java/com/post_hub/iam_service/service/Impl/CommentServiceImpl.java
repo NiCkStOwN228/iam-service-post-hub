@@ -1,5 +1,6 @@
-package com.post_hub.iam_service.service.Impl;
+package com.post_hub.iam_service.service.impl;
 
+import com.post_hub.iam_service.kafka.service.KafkaMessageService;
 import com.post_hub.iam_service.mapper.CommentMapper;
 import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -40,9 +42,10 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final AccessValidator accessValidator;
-
+    private final KafkaMessageService kafkaMessageService;
 
     @Override
+    @Transactional(readOnly = true)
     public IamResponse<CommentDTO> getCommentById(@NotNull Integer commentId) {
         Comment comment = commentRepository.findByIdAndDeletedFalse(commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.COMMENT_NOT_FOUND_BY_ID.getMessage(commentId)));
@@ -51,8 +54,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public IamResponse<CommentDTO> createComment(CommentRequest request) {
-        Integer userId = apiUtils.getUserIdFromAuthentification();
+    @Transactional
+    public IamResponse<CommentDTO> createComment(@NotNull CommentRequest request) {
+        Integer userId = apiUtils.getUserIdFromAuthentication();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
 
@@ -63,11 +67,14 @@ public class CommentServiceImpl implements CommentService {
         comment = commentRepository.save(comment);
         postRepository.save(post);
 
+        kafkaMessageService.sendCommentCreatedMessage(user.getId(), comment.getId());
+
         return IamResponse.createSuccessful(commentMapper.toDto(comment));
     }
 
     @Override
-    public IamResponse<CommentDTO> updateComment(@NotNull Integer commentId, UpdateCommentRequest request) {
+    @Transactional
+    public IamResponse<CommentDTO> updateComment(@NotNull Integer commentId, @NotNull UpdateCommentRequest request) {
         Comment comment = commentRepository.findByIdAndDeletedFalse(commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.COMMENT_NOT_FOUND_BY_ID.getMessage(commentId)));
 
@@ -82,10 +89,13 @@ public class CommentServiceImpl implements CommentService {
         commentMapper.updateComment(comment, request);
         comment = commentRepository.save(comment);
 
+        kafkaMessageService.sendCommentUpdatedMessage(comment.getUser().getId(), comment.getId(), comment.getMessage());
+
         return IamResponse.createSuccessful(commentMapper.toDto(comment));
     }
 
     @Override
+    @Transactional
     public void softDelete(@NotNull Integer commentId) {
         Comment comment = commentRepository.findByIdAndDeletedFalse(commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.COMMENT_NOT_FOUND_BY_ID.getMessage(commentId)));
@@ -98,10 +108,13 @@ public class CommentServiceImpl implements CommentService {
         Post post = comment.getPost();
         postRepository.save(post);
 
+        kafkaMessageService.sendCommentDeletedMessage(comment.getUser().getId(), comment.getId());
+
         IamResponse.createSuccessful(postMapper.toPostDTO(post));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IamResponse<PaginationResponse<CommentSearchDTO>> findAllComments(Pageable pageable) {
         Page<CommentSearchDTO> comments = commentRepository.findAll(pageable)
                 .map(commentMapper::toCommentSearchDTO);
@@ -120,6 +133,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IamResponse<PaginationResponse<CommentSearchDTO>> searchComments(@NotNull CommentSearchRequest request, Pageable pageable) {
         Specification<Comment> specification = new CommentSearchCriteria(request);
 
@@ -138,4 +152,5 @@ public class CommentServiceImpl implements CommentService {
 
         return IamResponse.createSuccessful(response);
     }
+
 }

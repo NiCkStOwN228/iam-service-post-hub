@@ -37,12 +37,9 @@ public class ApiUtils {
         return UUID.randomUUID().toString().replace(ApiConstants.DASH, StringUtils.EMPTY);
     }
 
-    public static String getCurrentUsername() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-    public Integer getUserIdFromAuthentification() {
+    public Integer getUserIdFromAuthentication() {
         String jwtToken = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
         return Integer.parseInt(jwtTokenProvider.getUserId(jwtToken));
     }
+
 }

@@ -20,4 +20,5 @@ public class CommentSearchDTO implements Serializable {
     private LocalDateTime created;
     private LocalDateTime updated;
     private Boolean isDeleted;
+
 }

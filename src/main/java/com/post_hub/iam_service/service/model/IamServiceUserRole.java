@@ -15,4 +15,5 @@ public enum IamServiceUserRole {
     public static IamServiceUserRole fromName(String name) {
         return IamServiceUserRole.valueOf(name.toUpperCase());
     }
+
 }

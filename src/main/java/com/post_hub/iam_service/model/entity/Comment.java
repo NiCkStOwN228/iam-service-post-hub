@@ -13,11 +13,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Comment {
-
-    public static final String ID_Field = "id";
+    public static final String ID_FIELD = "id";
     public static final String MESSAGE_NAME_FIELD = "message";
-    public static final String CREATED_AT_FIELD = "createdBy";
-    public static final String DELETED_AT_FIELD = "deleted";
+    public static final String CREATED_BY_FIELD = "createdBy";
+    public static final String DELETED_FIELD = "deleted";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

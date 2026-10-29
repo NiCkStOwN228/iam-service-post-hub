@@ -1,5 +1,6 @@
-package com.post_hub.iam_service.service.Impl;
+package com.post_hub.iam_service.service.impl;
 
+import com.post_hub.iam_service.kafka.service.KafkaMessageService;
 import com.post_hub.iam_service.mapper.UserMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.user.UserDTO;
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final AccessValidator accessValidator;
-
+    private final KafkaMessageService kafkaMessageService;
 
     @Override
     @Transactional(readOnly = true)
@@ -52,11 +53,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
 
-        UserDTO userDTO = userMapper.toDto(user);
-        return IamResponse.createSuccessful(userDTO);
+        return IamResponse.createSuccessful(userMapper.toDto(user));
     }
 
     @Override
+    @Transactional
     public IamResponse<UserDTO> createUser(@NotNull NewUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(request.getEmail()));
@@ -76,35 +77,38 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
 
         User savedUser = userRepository.save(user);
-        UserDTO userDTO = userMapper.toDto(savedUser);
 
-        return IamResponse.createSuccessful(userDTO);
+        kafkaMessageService.sendUserCreatedMessage(user.getId(), user.getUsername());
+
+        return IamResponse.createSuccessful(userMapper.toDto(savedUser));
     }
 
     @Override
-    public IamResponse<UserDTO> updateUser(@NotNull Integer userId, @NotNull UpdateUserRequest request) {
+    @Transactional
+    public IamResponse<UserDTO> updateUser(@NotNull Integer userId, UpdateUserRequest request) {
         User user = userRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
 
         accessValidator.validateAdminOrOwnerAccess(userId);
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(request.getEmail()));
-        }
-
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (!user.getUsername().equals(request.getUsername()) && userRepository.existsByUsername(request.getUsername())) {
             throw new DataExistException(ApiErrorMessage.USERNAME_ALREADY_EXISTS.getMessage(request.getUsername()));
         }
 
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(request.getEmail()));
+        }
+
         userMapper.updateUser(user, request);
-        user.setUpdated(LocalDateTime.now());
         user = userRepository.save(user);
 
-        UserDTO userDTO = userMapper.toDto(user);
-        return IamResponse.createSuccessful(userDTO);
+        kafkaMessageService.sendUserUpdatedMessage(user.getId(), user.getUsername());
+
+        return IamResponse.createSuccessful(userMapper.toDto(user));
     }
 
     @Override
+    @Transactional
     public void softDeleteUser(Integer userId) {
         User user = userRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
@@ -113,9 +117,12 @@ public class UserServiceImpl implements UserService {
 
         user.setDeleted(true);
         userRepository.save(user);
+
+        kafkaMessageService.sendUserDeletedMessage(userId, user.getUsername());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IamResponse<PaginationResponse<UserSearchDTO>> findAllUsers(Pageable pageable) {
         Page<UserSearchDTO> users = userRepository.findAll(pageable)
                 .map(userMapper::toUserSearchDto);
@@ -134,6 +141,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IamResponse<PaginationResponse<UserSearchDTO>> searchUsers(UserSearchRequest request, Pageable pageable) {
         Specification<User> specification = new UserSearchCriteria(request);
 
@@ -142,12 +150,12 @@ public class UserServiceImpl implements UserService {
 
         PaginationResponse<UserSearchDTO> response = PaginationResponse.<UserSearchDTO>builder()
                 .content(usersPage.getContent())
-        .pagination(PaginationResponse.Pagination.builder()
-                .total(usersPage.getTotalElements())
-                .limit(pageable.getPageSize())
-                .page(usersPage.getNumber() + 1)
-                .pages(usersPage.getTotalPages())
-                .build())
+                .pagination(PaginationResponse.Pagination.builder()
+                        .total(usersPage.getTotalElements())
+                        .limit(pageable.getPageSize())
+                        .page(usersPage.getNumber() + 1)
+                        .pages(usersPage.getTotalPages())
+                        .build())
                 .build();
 
         return IamResponse.createSuccessful(response);

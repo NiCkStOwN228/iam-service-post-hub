@@ -1,6 +1,5 @@
 package com.post_hub.iam_service.model.entity;
 
-import com.post_hub.iam_service.model.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Post {
-    public static final String ID_FIELD ="id";
+    public static final String ID_FIELD = "id";
     public static final String TITLE_NAME_FIELD = "title";
     public static final String CONTENT_NAME_FIELD = "content";
     public static final String LIKES_NAME_FIELD = "likes";

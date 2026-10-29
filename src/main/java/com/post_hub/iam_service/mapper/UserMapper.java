@@ -37,6 +37,7 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
+    @Mapping(target = "updated", expression = "java(java.time.LocalDateTime.now())")
     void updateUser(@MappingTarget User user, UpdateUserRequest request);
 
     @Mapping(source = "deleted", target = "isDeleted")
@@ -60,4 +61,5 @@ public interface UserMapper {
                 .map(role -> new RoleDTO(role.getId(), role.getName()))
                 .toList();
     }
+
 }

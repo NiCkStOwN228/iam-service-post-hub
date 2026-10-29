@@ -19,4 +19,5 @@ public class CommentDTO implements Serializable {
     private Integer postId;
     private LocalDateTime created;
     private LocalDateTime updated;
+
 }

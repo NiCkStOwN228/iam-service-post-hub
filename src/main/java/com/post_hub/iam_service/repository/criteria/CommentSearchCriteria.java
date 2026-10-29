@@ -1,9 +1,7 @@
 package com.post_hub.iam_service.repository.criteria;
 
 import com.post_hub.iam_service.model.entity.Comment;
-import com.post_hub.iam_service.model.entity.Post;
 import com.post_hub.iam_service.model.request.comment.CommentSearchRequest;
-import com.post_hub.iam_service.model.request.post.PostSearchRequest;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -33,11 +31,11 @@ public class CommentSearchCriteria implements Specification<Comment> {
         }
 
         if (Objects.nonNull(request.getCreatedBy())) {
-            predicates.add(criteriaBuilder.like(root.get(Comment.CREATED_AT_FIELD), "%" + request.getCreatedBy() + "%"));
+            predicates.add(criteriaBuilder.like(root.get(Comment.CREATED_BY_FIELD), "%" + request.getCreatedBy() + "%"));
         }
 
         if (Objects.nonNull(request.getDeleted())) {
-            predicates.add(criteriaBuilder.equal(root.get(Comment.DELETED_AT_FIELD), request.getDeleted()));
+            predicates.add(criteriaBuilder.equal(root.get(Comment.DELETED_FIELD), request.getDeleted()));
         }
 
         if (Objects.nonNull(request.getPostId())) {
@@ -47,7 +45,7 @@ public class CommentSearchCriteria implements Specification<Comment> {
         if (Objects.nonNull(request.getKeyword())) {
             Predicate keywordPredicate = criteriaBuilder.or(
                     criteriaBuilder.like(root.get(Comment.MESSAGE_NAME_FIELD), "%" + request.getKeyword() + "%"),
-                    criteriaBuilder.like(root.get(Comment.CREATED_AT_FIELD), "%" + request.getKeyword() + "%")
+                    criteriaBuilder.like(root.get(Comment.CREATED_BY_FIELD), "%" + request.getKeyword() + "%")
             );
             predicates.add(keywordPredicate);
         }
@@ -61,12 +59,11 @@ public class CommentSearchCriteria implements Specification<Comment> {
         if (Objects.nonNull(request.getSortField())) {
             switch (request.getSortField()) {
                 case MESSAGE -> query.orderBy(criteriaBuilder.desc(root.get(Comment.MESSAGE_NAME_FIELD)));
-                case CREATED_BY -> query.orderBy(criteriaBuilder.desc(root.get(Comment.CREATED_AT_FIELD)));
-
-                default -> query.orderBy(criteriaBuilder.desc(root.get(Comment.ID_Field)));
+                case CREATED_BY -> query.orderBy(criteriaBuilder.desc(root.get(Comment.CREATED_BY_FIELD)));
+                default -> query.orderBy(criteriaBuilder.desc(root.get(Comment.ID_FIELD)));
             }
-        } else  {
-            query.orderBy(criteriaBuilder.desc(root.get(Comment.ID_Field)));
+        } else {
+            query.orderBy(criteriaBuilder.desc(root.get(Comment.ID_FIELD)));
         }
     }
 }

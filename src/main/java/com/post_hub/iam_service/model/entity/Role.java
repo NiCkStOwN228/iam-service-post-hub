@@ -23,7 +23,6 @@ public class Role {
     @Column(nullable = false)
     private String name;
 
-
     @Column(name = "user_system_role", nullable = false, updatable = false)
     @Convert(converter = UserRoleTypeConverter.class)
     private IamServiceUserRole userSystemRole;
@@ -36,4 +35,5 @@ public class Role {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles", cascade = CascadeType.MERGE)
     private Set<User> users = new HashSet<>();
+
 }

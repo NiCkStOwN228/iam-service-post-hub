@@ -19,20 +19,25 @@ import java.util.Objects;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         imports = {DateTimeUtils.class, Objects.class}
 )
-
 public interface PostMapper {
 
     PostDTO toPostDTO(Post post);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
-    Post createPost(NewPostRequest newPostRequest);
+    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(source = "user", target = "user")
+    @Mapping(source = "createdBy", target = "createdBy")
+    Post createPost(NewPostRequest newPostRequest, User user, String createdBy);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
+    @Mapping(target = "updated", expression = "java(java.time.LocalDateTime.now())")
     void updatePost(@MappingTarget Post post, UpdatePostRequest request);
 
     @Mapping(source = "deleted", target = "isDeleted")
     @Mapping(target = "createdBy", source = "user.username")
     PostSearchDTO toPostSearchDTO(Post post);
+
 }

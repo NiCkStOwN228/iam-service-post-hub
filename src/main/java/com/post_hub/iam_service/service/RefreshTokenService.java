@@ -8,4 +8,5 @@ public interface RefreshTokenService {
     RefreshToken generateOrUpdateRefreshToken(User user);
 
     RefreshToken validateAndRefreshToken(String refreshToken);
+
 }

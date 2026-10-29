@@ -1,8 +1,9 @@
 package com.post_hub.iam_service.controller;
 
+import com.post_hub.iam_service.config.SwaggerInnerKey;
 import com.post_hub.iam_service.model.constants.ApiLogMessage;
 import com.post_hub.iam_service.utils.ApiUtils;
-import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class InnerController {
 
-    @Hidden
+    @SwaggerInnerKey
     @GetMapping("/healthCheck")
+    @Operation(summary = "HealthCheck for service")
     public ResponseEntity<Void> healthCheck() {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
 

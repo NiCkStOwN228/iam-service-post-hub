@@ -10,12 +10,11 @@ import com.post_hub.iam_service.model.response.PaginationResponse;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
 
-
 public interface PostService {
 
     IamResponse<PostDTO> getById(@NotNull Integer userId);
 
-    IamResponse<PostDTO> createPost(@NotNull NewPostRequest request, String username);
+    IamResponse<PostDTO> createPost(@NotNull NewPostRequest request);
 
     IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest request);
 
@@ -24,4 +23,5 @@ public interface PostService {
     IamResponse<PaginationResponse<PostSearchDTO>> findAllPosts(Pageable pageable);
 
     IamResponse<PaginationResponse<PostSearchDTO>> searchPosts(PostSearchRequest request, Pageable pageable);
+
 }

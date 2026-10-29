@@ -1,7 +1,6 @@
 package com.post_hub.iam_service.security.handler;
 
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -18,9 +17,8 @@ public class AccessRestrictionHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) {
-
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.getWriter().write(ApiErrorMessage.HAVE_NO_ACCESS.getMessage());
-
     }
+
 }

@@ -26,5 +26,4 @@ public class PaginationResponse<T> implements Serializable {
         private int page;
         private int pages;
     }
-
 }

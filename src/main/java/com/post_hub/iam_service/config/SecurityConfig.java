@@ -4,9 +4,12 @@ import com.post_hub.iam_service.security.filter.JwtRequestFilter;
 import com.post_hub.iam_service.security.handler.AccessRestrictionHandler;
 import com.post_hub.iam_service.service.UserService;
 import com.post_hub.iam_service.service.model.IamServiceUserRole;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -34,31 +36,30 @@ public class SecurityConfig {
     private static final String GET = "GET";
     private static final String POST = "POST";
 
-    private static final AntPathRequestMatcher[] NOT_SECURED_URLS = new AntPathRequestMatcher[] {
+    private static final AntPathRequestMatcher[] NOT_SECURED_URLS = new AntPathRequestMatcher[]{
             new AntPathRequestMatcher("/auth/login", POST),
             new AntPathRequestMatcher("/auth/register", POST),
             new AntPathRequestMatcher("/auth/refresh/token", GET),
 
             new AntPathRequestMatcher("/v3/api-docs/**"),
             new AntPathRequestMatcher("/swagger-ui/**"),
-            new AntPathRequestMatcher("/swagger-ui.html/**"),
-            new AntPathRequestMatcher("/webjars/**"),
+            new AntPathRequestMatcher("/swagger-ui.html"),
+            new AntPathRequestMatcher("/webjars/**")
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(NOT_SECURED_URLS).permitAll()
-//                        .requestMatchers(get("/users/all")).hasAnyAuthority(adminAccessSecurityRoles())
-//                        .requestMatchers(get("/posts/all")).hasAnyAuthority(adminAccessSecurityRoles())
+
                         .requestMatchers(post("/users/create")).hasAnyAuthority(adminAccessSecurityRoles())
+
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> exception
+                .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                         .accessDeniedHandler(accessRestrictionHandler)
                 )
@@ -68,9 +69,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
     }
 
     @Bean
@@ -82,15 +82,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     private String[] adminAccessSecurityRoles() {
-            return new String[] {
-                    IamServiceUserRole.SUPER_ADMIN.name(),
-                    IamServiceUserRole.ADMIN.name()
-            };
+        return new String[]{
+                IamServiceUserRole.SUPER_ADMIN.name(),
+                IamServiceUserRole.ADMIN.name()
+        };
     }
 
     private static AntPathRequestMatcher get(String pattern) {
@@ -100,4 +100,18 @@ public class SecurityConfig {
     private static AntPathRequestMatcher post(String pattern) {
         return new AntPathRequestMatcher(pattern, POST);
     }
+
+    @Bean
+    public OpenApiCustomizer jwtAuthCustomizer() {
+        return openApi ->
+                openApi.getComponents()
+                        .addSecuritySchemes(HttpHeaders.AUTHORIZATION,
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .in(SecurityScheme.In.HEADER)
+                                        .name(HttpHeaders.AUTHORIZATION));
+    }
+
 }

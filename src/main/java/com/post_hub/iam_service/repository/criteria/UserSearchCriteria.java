@@ -27,15 +27,15 @@ public class UserSearchCriteria implements Specification<User> {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (Objects.nonNull(request.getUsername())){
+        if (Objects.nonNull(request.getUsername())) {
             predicates.add(criteriaBuilder.like(root.get(User.USERNAME_NAME_FIELD), "%" + request.getUsername() + "%"));
         }
 
-        if (Objects.nonNull(request.getEmail())){
+        if (Objects.nonNull(request.getEmail())) {
             predicates.add(criteriaBuilder.like(root.get(User.EMAIL_NAME_FIELD), "%" + request.getEmail() + "%"));
         }
 
-        if (Objects.nonNull(request.getDeleted())){
+        if (Objects.nonNull(request.getDeleted())) {
             predicates.add(criteriaBuilder.equal(root.get(User.DELETED_FIELD), request.getDeleted()));
         }
 
@@ -44,7 +44,6 @@ public class UserSearchCriteria implements Specification<User> {
                     criteriaBuilder.like(root.get(User.USERNAME_NAME_FIELD), "%" + request.getKeyword() + "%"),
                     criteriaBuilder.like(root.get(User.EMAIL_NAME_FIELD), "%" + request.getKeyword() + "%")
             );
-
             predicates.add(keywordPredicate);
         }
 
@@ -58,7 +57,7 @@ public class UserSearchCriteria implements Specification<User> {
             switch (request.getSortField()) {
                 case USERNAME -> query.orderBy(cb.asc(root.get(User.USERNAME_NAME_FIELD)));
                 case EMAIL -> query.orderBy(cb.asc(root.get(User.EMAIL_NAME_FIELD)));
-                default -> query.orderBy(cb.desc(root.get(User.ID_FIELD)));
+                default -> query.orderBy(cb.asc(root.get(User.ID_FIELD)));
             }
         } else {
             query.orderBy(cb.asc(root.get(User.ID_FIELD)));

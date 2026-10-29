@@ -24,4 +24,5 @@ public interface UserService extends UserDetailsService {
     IamResponse<PaginationResponse<UserSearchDTO>> findAllUsers(Pageable pageable);
 
     IamResponse<PaginationResponse<UserSearchDTO>> searchUsers(UserSearchRequest request, Pageable pageable);
+
 }

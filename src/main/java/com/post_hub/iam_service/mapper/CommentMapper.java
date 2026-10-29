@@ -49,4 +49,5 @@ public interface CommentMapper {
     @Mapping(source = "post.id", target = "postId")
     @Mapping(source = "deleted", target = "isDeleted")
     CommentSearchDTO toCommentSearchDTO(Comment comment);
+
 }

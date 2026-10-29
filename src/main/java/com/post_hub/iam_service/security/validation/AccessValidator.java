@@ -31,7 +31,6 @@ public class AccessValidator {
             throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(email));
         });
 
-
         if (!password.equals(confirmPassword)) {
             throw new InvalidDataException(ApiErrorMessage.MISMATCH_PASSWORDS.getMessage());
         }
@@ -45,6 +44,7 @@ public class AccessValidator {
     public boolean isAdminOrSuperAdmin(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
+
         return user.getRoles().stream()
                 .map(role -> IamServiceUserRole.fromName(role.getName()))
                 .anyMatch(role -> role == IamServiceUserRole.ADMIN || role == IamServiceUserRole.SUPER_ADMIN);
@@ -52,10 +52,11 @@ public class AccessValidator {
 
     @SneakyThrows
     public void validateAdminOrOwnerAccess(Integer ownerId) {
-        Integer currentUserId = apiUtils.getUserIdFromAuthentification();
+        Integer currentUserId = apiUtils.getUserIdFromAuthentication();
 
         if (!currentUserId.equals(ownerId) && !isAdminOrSuperAdmin(currentUserId)) {
             throw new AccessDeniedException(ApiErrorMessage.HAVE_NO_ACCESS.getMessage());
         }
     }
+
 }

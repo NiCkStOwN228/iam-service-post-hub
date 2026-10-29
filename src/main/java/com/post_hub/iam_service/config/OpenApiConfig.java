@@ -2,6 +2,7 @@ package com.post_hub.iam_service.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -20,10 +21,21 @@ import java.util.Objects;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "POST_HUB REST API",
-                version = "1.0"
+                title = "'POST_HUB' REST API",
+                version = "1.0",
+                description = """
+                        'IAM-service' - is the authentication and registration service. It allows users to:
+
+                        - Authenticate
+                        - Register
+                        - Create new users
+                        - Create posts
+                        - Write comments to posts
+
+                        Created by Mykola Shchypailo | [Send me email](mailto:mykola.shchypailo@gmail.com)""",
+                contact = @Contact(name = "POST_HUB")
         ),
-        security = { @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)}
+        security = { @SecurityRequirement(name = HttpHeaders.AUTHORIZATION) }
 )
 @SecurityScheme(
         name = HttpHeaders.AUTHORIZATION,
@@ -39,7 +51,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("public-api")
+                .group("iam-service")
                 .packagesToScan("com.post_hub.iam_service")
                 .addOpenApiCustomizer(serverCustomizer())
                 .build();

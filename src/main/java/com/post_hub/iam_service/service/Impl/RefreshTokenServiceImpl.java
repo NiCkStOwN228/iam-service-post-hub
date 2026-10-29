@@ -1,4 +1,4 @@
-package com.post_hub.iam_service.service.Impl;
+package com.post_hub.iam_service.service.impl;
 
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.entity.RefreshToken;
@@ -10,6 +10,7 @@ import com.post_hub.iam_service.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +18,10 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
+    @Transactional
     public RefreshToken generateOrUpdateRefreshToken(User user) {
         return refreshTokenRepository.findByUserId(user.getId())
                 .map(refreshToken -> {
@@ -35,10 +36,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                     newToken.setToken(ApiUtils.generateUuidWithoutDash());
                     return refreshTokenRepository.save(newToken);
                 });
-
     }
 
     @Override
+    @Transactional
     public RefreshToken validateAndRefreshToken(String requestRefreshToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)
                 .orElseThrow(() -> new NotFoundException(ApiErrorMessage.NOT_FOUND_REFRESH_TOKEN.getMessage()));
@@ -47,4 +48,5 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshToken.setToken(ApiUtils.generateUuidWithoutDash());
         return refreshTokenRepository.save(refreshToken);
     }
+
 }

@@ -1,4 +1,5 @@
 package com.post_hub.iam_service.security.filter;
+
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.security.JwtTokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -68,7 +69,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
-
             } catch (ExpiredJwtException e) {
                 handleTokenExpiration(requestURI, jwt, response);
                 return;

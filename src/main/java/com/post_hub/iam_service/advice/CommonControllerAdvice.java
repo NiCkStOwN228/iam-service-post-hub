@@ -1,13 +1,12 @@
 package com.post_hub.iam_service.advice;
 
 import com.post_hub.iam_service.model.constants.ApiConstants;
-import com.post_hub.iam_service.model.exception.DataExistException;
-import com.post_hub.iam_service.model.exception.InvalidPasswordException;
-import com.post_hub.iam_service.model.exception.NotFoundException;
+import com.post_hub.iam_service.model.constants.ApiErrorMessage;
+import com.post_hub.iam_service.model.exception.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,7 +26,7 @@ public class CommonControllerAdvice {
 
     @ExceptionHandler
     @ResponseBody
-    protected ResponseEntity<String> handleNotFoundException(NotFoundException ex){
+    protected ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
         logStackTrace(ex);
 
         return ResponseEntity
@@ -37,11 +36,42 @@ public class CommonControllerAdvice {
 
     @ExceptionHandler(DataExistException.class)
     @ResponseBody
-    protected ResponseEntity<String> handleDataExistException(DataExistException ex){
+    protected ResponseEntity<String> handleDataExistException(DataExistException ex) {
         logStackTrace(ex);
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        logStackTrace(ex);
+
+        Map<String, String> errors = new HashMap<>();
+        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
+            String errorMessage = error.getDefaultMessage();
+            errors.put("error", errorMessage);
+        }
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    protected ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+        logStackTrace(ex);
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDataException.class)
+    @ResponseBody
+    protected ResponseEntity<String> handleInvalidDataException(InvalidDataException ex) {
+        logStackTrace(ex);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 
@@ -61,17 +91,13 @@ public class CommonControllerAdvice {
                 .body(ex.getMessage());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(InternalException.class)
+    @ResponseBody
+    protected ResponseEntity<String> handleUndefinedException(InternalException ex) {
         logStackTrace(ex);
-
-        Map<String, String> errors = new HashMap<>();
-        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
-            String errorMessage = error.getDefaultMessage();
-            errors.put("error", errorMessage);
-        }
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiErrorMessage.UNEXPECTED_ERROR_OCCURRED.getMessage());
     }
 
     private void logStackTrace(Exception ex) {

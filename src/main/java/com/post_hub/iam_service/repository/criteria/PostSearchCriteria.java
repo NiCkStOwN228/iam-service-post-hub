@@ -60,10 +60,10 @@ public class PostSearchCriteria implements Specification<Post> {
             switch (request.getSortField()) {
                 case TITLE -> query.orderBy(criteriaBuilder.desc(root.get(Post.TITLE_NAME_FIELD)));
                 case CONTENT -> query.orderBy(criteriaBuilder.desc(root.get(Post.CONTENT_NAME_FIELD)));
-                case LIKES ->  query.orderBy(criteriaBuilder.desc(root.get(Post.LIKES_NAME_FIELD)));
+                case LIKES -> query.orderBy(criteriaBuilder.desc(root.get(Post.LIKES_NAME_FIELD)));
                 default -> query.orderBy(criteriaBuilder.desc(root.get(Post.ID_FIELD)));
             }
-        } else  {
+        } else {
             query.orderBy(criteriaBuilder.desc(root.get(Post.ID_FIELD)));
         }
     }
