@@ -3,6 +3,8 @@ package com.post_hub.iam_service.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.post_hub.iam_service.kafka.model.utils.PostHubService;
 import com.post_hub.iam_service.kafka.model.utils.UtilMessage;
+import com.post_hub.iam_service.model.constants.ApiErrorMessage;
+import com.post_hub.iam_service.model.constants.ApiLogMessage;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -24,22 +26,23 @@ public class MessageProducer {
     @Value(value = "${additional.kafka.topic.iam.service.logs}")
     private String logsOutTopic;
 
-    @Value(value = "${kafka.enabled}")
+    @Value("${kafka.enabled:false}")
     private boolean isKafkaEnabled;
 
     public void sendLogs(@NotNull @Valid UtilMessage message) {
         if (!isKafkaEnabled) {
-            log.trace("Kafka is not enabled. Message will not be placed im iam_logs topic [message={}] ", message);
+            log.trace(ApiLogMessage.KAFKA_DISABLED.getValue(), message);
             return;
         }
         try {
             message.setService(PostHubService.IAM_SERVICE);
             String messageJson = objectMapper.writeValueAsString(message);
-            log.debug("Sending message to Kafka: {}", messageJson);
+            log.debug(ApiLogMessage.KAFKA_SENDING.getValue(), messageJson);
+
             kafkaTemplate.send(logsOutTopic, messageJson).get();
-            log.debug("Kafka {} message sent. Topic: '{}', message: '{}'", message.getActionType(), logsOutTopic, messageJson);
+            log.debug(ApiLogMessage.KAFKA_SENT.getValue(), message.getActionType(), logsOutTopic, messageJson);
         } catch (Exception cause) {
-            log.error("Kafka message didn't send. ", cause);
+            log.error(ApiErrorMessage.KAFKA_SEND_FAILED.getMessage(), cause);
         }
     }
 }
